@@ -49,6 +49,11 @@ export AI_EMBEDDING_MODEL=text-embedding-ada-002
 
 ### 3. Run the application
 
+### first run postgres
+```
+docker run --name postgres-chatbot -e POSTGRES_DB=chatbot_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -v ./postgres-chatbot\volume:/var/lib/postgresql -d pgvector/pgvector:pg18-trixie
+```
+
 ```bash
 ./mvnw spring-boot:run
 ```
