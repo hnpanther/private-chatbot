@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--
+        Reads the log directory from the Spring property 'app.log.path'.
+        Falls back to 'ProdLogs' in the working directory if not set.
+    -->
+    <springProperty scope="context" name="LOG_PATH" source="app.log.path" defaultValue="ProdLogs"/>
+
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{40} - %msg%n"/>
+
+    <!-- ── Console appender (human-readable with colour) ───────────────── -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ── Rolling file appender: active at ProdLogs/app.log ──────────── -->
+    <!--    Archives daily to ProdLogs/ArchiveLog/app.YYYY-MM-DD.log.gz   -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/ArchiveLog/app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <!-- Retain 90 days of archived logs -->
+            <maxHistory>90</maxHistory>
+            <!-- Hard cap across all archived files -->
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ── Application packages: DEBUG so service/controller traces show ─ -->
+    <logger name="com.hnp.privatechatbot" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- ── Silence noisy Spring Security initialisation warning ────────── -->
+    <logger name="org.springframework.security.config.annotation.authentication.configuration" level="ERROR"/>
+
+    <!-- ── Root: INFO for all Spring / library code ─────────────────────── -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

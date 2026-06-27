@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${selectedBot != null ? selectedBot.name + ' - چت‌بات' : 'چت‌بات هوشمند'}">چت‌بات هوشمند</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="chat-layout">
+
+<!-- Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="chat-container d-flex" style="height: calc(100vh - 56px);">
+
+    <!-- Right Sidebar: Chatbot List -->
+    <div class="chatbot-sidebar border-start bg-light d-flex flex-column" style="width: 280px; min-width: 220px;">
+        <div class="p-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-muted">
+                <i class="bi bi-grid-3x3-gap me-1"></i> چت‌بات‌ها
+            </h6>
+        </div>
+        <div class="overflow-auto flex-grow-1 p-2">
+            <div th:if="${chatBots == null or chatBots.isEmpty()}" class="text-center text-muted p-4">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                <small>هیچ چت‌باتی در دسترس نیست</small>
+            </div>
+
+            <!-- Group chatbots by department -->
+            <div th:each="bot : ${chatBots}">
+                <a th:href="@{/chat/{id}(id=${bot.id})}"
+                   th:classappend="${selectedBot != null and selectedBot.id == bot.id} ? 'active' : ''"
+                   class="chatbot-item d-flex align-items-center gap-2 p-2 rounded mb-1 text-decoration-none">
+                    <div class="chatbot-icon">
+                        <i th:class="${bot.icon ?: 'bi bi-robot'}" class="fs-5"></i>
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="fw-medium text-truncate small" th:text="${bot.name}"></div>
+                        <div class="text-muted" style="font-size: 0.7rem;" th:text="${bot.department.name}"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="flex-grow-1 d-flex flex-column overflow-hidden">
+
+        <!-- No bot selected -->
+        <div th:if="${selectedBot == null}" class="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+            <i class="bi bi-chat-dots" style="font-size: 4rem; opacity: 0.3;"></i>
+            <h5 class="mt-3">یک چت‌بات را از سمت راست انتخاب کنید</h5>
+            <p class="small">برای شروع مکالمه روی یکی از چت‌بات‌ها کلیک کنید</p>
+        </div>
+
+        <!-- Bot selected -->
+        <div th:if="${selectedBot != null}" class="d-flex h-100 overflow-hidden">
+
+            <!-- Session History Sidebar -->
+            <div class="session-sidebar border-start bg-white d-flex flex-column" style="width: 230px; min-width: 180px;">
+                <div class="p-2 border-bottom d-flex align-items-center justify-content-between">
+                    <small class="fw-bold text-muted">مکالمات</small>
+                    <button class="btn btn-sm btn-primary"
+                            th:data-botid="${selectedBot.id}"
+                            onclick="newSession(this.dataset.botid)"
+                            title="مکالمه جدید">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                </div>
+                <div class="overflow-auto flex-grow-1 p-1">
+                    <div th:if="${sessions == null or sessions.isEmpty()}" class="text-center text-muted p-3">
+                        <small>مکالمه‌ای وجود ندارد</small>
+                    </div>
+                    <a th:each="s : ${sessions}"
+                       th:href="@{/chat/{botId}(botId=${selectedBot.id}, sessionId=${s.id})}"
+                       th:classappend="${activeSession != null and activeSession.id == s.id} ? 'active' : ''"
+                       class="session-item d-flex align-items-start gap-1 p-2 rounded mb-1 text-decoration-none">
+                        <i class="bi bi-chat-left-text mt-1 flex-shrink-0 small"></i>
+                        <div class="overflow-hidden">
+                            <div class="text-truncate small fw-medium" th:text="${s.title}"></div>
+                            <div class="text-muted" style="font-size: 0.65rem;"
+                                 th:text="${#temporals.format(s.updatedAt, 'HH:mm - yyyy/MM/dd')}"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="flex-grow-1 d-flex flex-column overflow-hidden">
+                <!-- Bot header -->
+                <div class="border-bottom p-3 bg-white d-flex align-items-center gap-2">
+                    <i th:class="${selectedBot.icon ?: 'bi bi-robot'}" class="fs-4 text-primary"></i>
+                    <div>
+                        <div class="fw-bold" th:text="${selectedBot.name}"></div>
+                        <small class="text-muted" th:text="${selectedBot.department.name}"></small>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div class="messages-area flex-grow-1 overflow-auto p-3" id="messagesArea">
+                    <div th:if="${activeSession == null}" class="text-center text-muted mt-5">
+                        <i class="bi bi-chat-dots fs-1 d-block mb-2 opacity-25"></i>
+                        <p>پیام خود را بنویسید تا مکالمه شروع شود</p>
+                    </div>
+
+                    <div th:if="${messages != null}">
+                        <div th:each="msg : ${messages}"
+                             th:class="${msg.role.name() == 'USER'} ? 'message user-message d-flex justify-content-end mb-3' : 'message ai-message d-flex justify-content-start mb-3'">
+                            <div th:if="${msg.role.name() == 'ASSISTANT'}" class="avatar-icon me-2">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
+                                    <i class="bi bi-robot small"></i>
+                                </div>
+                            </div>
+                            <div class="message-bubble" th:text="${msg.content}"></div>
+                            <div th:if="${msg.role.name() == 'USER'}" class="avatar-icon ms-2">
+                                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
+                                    <i class="bi bi-person small"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Typing indicator -->
+                    <div id="typingIndicator" class="message ai-message d-flex justify-content-start mb-3 d-none">
+                        <div class="avatar-icon me-2">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
+                                <i class="bi bi-robot small"></i>
+                            </div>
+                        </div>
+                        <div class="message-bubble typing-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input area -->
+                <div class="input-area border-top p-3 bg-white" th:if="${selectedBot != null}">
+                    <div class="input-group">
+                        <textarea class="form-control" id="userInput" rows="1"
+                                  placeholder="پیام خود را بنویسید..." style="resize: none;"></textarea>
+                        <button class="btn btn-primary px-3" id="sendBtn" type="button">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted mt-1 d-block">Enter برای ارسال، Shift+Enter برای خط جدید</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    const selectedBotId = /*[[${selectedBot?.id}]]*/ null;
+    const activeSessionId = /*[[${activeSession?.id}]]*/ null;
+    const csrfToken = /*[[${_csrf.token}]]*/ '';
+    const csrfHeader = /*[[${_csrf.headerName}]]*/ 'X-XSRF-TOKEN';
+
+    let currentSessionId = activeSessionId;
+
+    function scrollToBottom() {
+        const area = document.getElementById('messagesArea');
+        if (area) area.scrollTop = area.scrollHeight;
+    }
+
+    function appendMessage(role, content) {
+        const area = document.getElementById('messagesArea');
+        const isUser = role === 'USER';
+        const div = document.createElement('div');
+        div.className = `message ${isUser ? 'user-message d-flex justify-content-end' : 'ai-message d-flex justify-content-start'} mb-3`;
+        div.innerHTML = `
+            ${!isUser ? `<div class="avatar-icon me-2"><div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="bi bi-robot small"></i></div></div>` : ''}
+            <div class="message-bubble">${escapeHtml(content)}</div>
+            ${isUser ? `<div class="avatar-icon ms-2"><div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="bi bi-person small"></i></div></div>` : ''}
+        `;
+        area.insertBefore(div, document.getElementById('typingIndicator'));
+        scrollToBottom();
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+        if (!text || !selectedBotId) return;
+
+        input.value = '';
+        input.style.height = 'auto';
+        appendMessage('USER', text);
+
+        document.getElementById('typingIndicator').classList.remove('d-none');
+        document.getElementById('sendBtn').disabled = true;
+        scrollToBottom();
+
+        try {
+            const res = await fetch('/api/chat/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    chatbotId: selectedBotId,
+                    sessionId: currentSessionId,
+                    message: text
+                })
+            });
+            const data = await res.json();
+            document.getElementById('typingIndicator').classList.add('d-none');
+
+            if (data.success) {
+                if (!currentSessionId && data.sessionId) {
+                    currentSessionId = data.sessionId;
+                    history.replaceState(null, '', `/chat/${selectedBotId}?sessionId=${data.sessionId}`);
+                    document.querySelector('.input-area')?.classList.remove('d-none');
+                }
+                appendMessage('ASSISTANT', data.answer);
+            } else {
+                appendMessage('ASSISTANT', '❌ خطا: ' + (data.errorMessage || 'خطای ناشناخته'));
+            }
+        } catch (e) {
+            document.getElementById('typingIndicator').classList.add('d-none');
+            appendMessage('ASSISTANT', '❌ خطا در ارتباط با سرور');
+        } finally {
+            document.getElementById('sendBtn').disabled = false;
+        }
+    }
+
+    function newSession(botId) {
+        if (!currentSessionId && String(selectedBotId) === String(botId)) {
+            // Already in new-session mode — just focus the input
+            document.getElementById('userInput')?.focus();
+            return;
+        }
+        window.location.href = `/chat/${botId}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        scrollToBottom();
+
+        const input = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        if (!input || !sendBtn) return;
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        input.addEventListener('input', () => {
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+        });
+
+        // If session is open but no messages yet, enable input
+        if (currentSessionId) {
+            input.focus();
+        }
+    });
+</script>
+</body>
+</html>

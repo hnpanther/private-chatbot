@@ -1,0 +1,1539 @@
+{
+  "groups": [
+    {
+      "name": "spring.ai.openai",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.options",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties$Options",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties",
+      "sourceMethod": "getOptions()"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.options",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties$Options",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties",
+      "sourceMethod": "getOptions()"
+    },
+    {
+      "name": "spring.ai.openai.chat",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.options",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties",
+      "sourceMethod": "getOptions()"
+    },
+    {
+      "name": "spring.ai.openai.chat.options.tool-choice",
+      "type": "java.lang.Object",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "sourceMethod": "getToolChoice()"
+    },
+    {
+      "name": "spring.ai.openai.chat.output-audio",
+      "type": "org.springframework.ai.openai.OpenAiChatOptions$AudioParameters",
+      "sourceType": "org.springframework.ai.openai.OpenAiChatOptions"
+    },
+    {
+      "name": "spring.ai.openai.chat.tool-choice",
+      "type": "java.lang.Object",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties",
+      "sourceMethod": "getToolChoice()"
+    },
+    {
+      "name": "spring.ai.openai.embedding",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.options",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties$Options",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties",
+      "sourceMethod": "getOptions()"
+    },
+    {
+      "name": "spring.ai.openai.image",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.options",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties",
+      "sourceMethod": "getOptions()"
+    },
+    {
+      "name": "spring.ai.openai.moderation",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.options",
+      "type": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties$Options",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties",
+      "sourceMethod": "getOptions()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "spring.ai.openai.api-key",
+      "type": "java.lang.String",
+      "description": "The API key to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.api-key",
+      "type": "java.lang.String",
+      "description": "The API key to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.base-url",
+      "type": "java.lang.String",
+      "description": "The deployment URL to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.connection-pool-metrics-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable connection pool metrics for the underlying OkHttp client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.credential",
+      "type": "com.openai.credential.Credential",
+      "description": "Credentials used to connect to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.custom-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "Custom HTTP headers to add to OpenAI client requests.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.git-hub-models",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.input",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.max-retries",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retries for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.microsoft-deployment-name",
+      "type": "java.lang.String",
+      "description": "The deployment name as defined in Microsoft Foundry. On Microsoft Foundry, the default deployment name is the same as the model name. When using OpenAI directly, this value isn't used.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.microsoft-foundry",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.microsoft-foundry-service-version",
+      "type": "com.openai.azure.AzureOpenAIServiceVersion",
+      "description": "The Service version to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.organization-id",
+      "type": "java.lang.String",
+      "description": "The organization ID to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.proxy",
+      "type": "java.net.Proxy",
+      "description": "Proxy settings for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.response-format",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.speed",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.timeout",
+      "type": "java.time.Duration",
+      "description": "Request timeout for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties",
+      "defaultValue": "60s"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.voice",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.api-key",
+      "type": "java.lang.String",
+      "description": "The API key to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.base-url",
+      "type": "java.lang.String",
+      "description": "The deployment URL to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.connection-pool-metrics-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable connection pool metrics for the underlying OkHttp client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.credential",
+      "type": "com.openai.credential.Credential",
+      "description": "Credentials used to connect to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.custom-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "Custom HTTP headers to add to OpenAI client requests.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.git-hub-models",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.language",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.max-retries",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retries for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.microsoft-deployment-name",
+      "type": "java.lang.String",
+      "description": "The deployment name as defined in Microsoft Foundry. On Microsoft Foundry, the default deployment name is the same as the model name. When using OpenAI directly, this value isn't used.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.microsoft-foundry",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.microsoft-foundry-service-version",
+      "type": "com.openai.azure.AzureOpenAIServiceVersion",
+      "description": "The Service version to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.organization-id",
+      "type": "java.lang.String",
+      "description": "The organization ID to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.prompt",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.proxy",
+      "type": "java.net.Proxy",
+      "description": "Proxy settings for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.response-format",
+      "type": "com.openai.models.audio.AudioResponseFormat",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.temperature",
+      "type": "java.lang.Float",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.timeout",
+      "type": "java.time.Duration",
+      "description": "Request timeout for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties",
+      "defaultValue": "60s"
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.timestamp-granularities",
+      "type": "java.util.List<com.openai.models.audio.transcriptions.TranscriptionCreateParams$TimestampGranularity>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties"
+    },
+    {
+      "name": "spring.ai.openai.base-url",
+      "type": "java.lang.String",
+      "description": "The deployment URL to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.api-key",
+      "type": "java.lang.String",
+      "description": "The API key to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.base-url",
+      "type": "java.lang.String",
+      "description": "The deployment URL to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.connection-pool-metrics-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable connection pool metrics for the underlying OkHttp client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "spring.ai.openai.chat.credential",
+      "type": "com.openai.credential.Credential",
+      "description": "Credentials used to connect to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.custom-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "Custom HTTP headers to add to OpenAI client requests.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.extra-body",
+      "type": "java.util.Map<java.lang.String,java.lang.Object>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.frequency-penalty",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.git-hub-models",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.logit-bias",
+      "type": "java.util.Map<java.lang.String,java.lang.Integer>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.logprobs",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.max-completion-tokens",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.max-retries",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retries for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "spring.ai.openai.chat.max-tokens",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.metadata",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.microsoft-deployment-name",
+      "type": "java.lang.String",
+      "description": "The deployment name as defined in Microsoft Foundry. On Microsoft Foundry, the default deployment name is the same as the model name. When using OpenAI directly, this value isn't used.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.microsoft-foundry",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.microsoft-foundry-service-version",
+      "type": "com.openai.azure.AzureOpenAIServiceVersion",
+      "description": "The Service version to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.n",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.organization-id",
+      "type": "java.lang.String",
+      "description": "The organization ID to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.output-audio",
+      "type": "org.springframework.ai.openai.OpenAiChatOptions$AudioParameters",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.output-audio.format",
+      "type": "org.springframework.ai.openai.OpenAiChatOptions$AudioParameters$AudioResponseFormat",
+      "sourceType": "org.springframework.ai.openai.OpenAiChatOptions$AudioParameters"
+    },
+    {
+      "name": "spring.ai.openai.chat.output-audio.voice",
+      "type": "org.springframework.ai.openai.OpenAiChatOptions$AudioParameters$Voice",
+      "sourceType": "org.springframework.ai.openai.OpenAiChatOptions$AudioParameters"
+    },
+    {
+      "name": "spring.ai.openai.chat.output-modalities",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.parallel-tool-calls",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.presence-penalty",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.prompt-cache-key",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.proxy",
+      "type": "java.net.Proxy",
+      "description": "Proxy settings for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.reasoning-effort",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.response-format",
+      "type": "org.springframework.ai.openai.OpenAiChatModel$ResponseFormat",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.seed",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.service-tier",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.stop",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.store",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.stream-options",
+      "type": "org.springframework.ai.openai.OpenAiChatOptions$StreamOptions",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.temperature",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.timeout",
+      "type": "java.time.Duration",
+      "description": "Request timeout for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties",
+      "defaultValue": "60s"
+    },
+    {
+      "name": "spring.ai.openai.chat.top-logprobs",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.top-p",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.user",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.chat.verbosity",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties"
+    },
+    {
+      "name": "spring.ai.openai.connection-pool-metrics-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable connection pool metrics for the underlying OkHttp client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "spring.ai.openai.credential",
+      "type": "com.openai.credential.Credential",
+      "description": "Credentials used to connect to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.custom-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "Custom HTTP headers to add to OpenAI client requests.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.api-key",
+      "type": "java.lang.String",
+      "description": "The API key to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.base-url",
+      "type": "java.lang.String",
+      "description": "The deployment URL to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.connection-pool-metrics-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable connection pool metrics for the underlying OkHttp client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "spring.ai.openai.embedding.credential",
+      "type": "com.openai.credential.Credential",
+      "description": "Credentials used to connect to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.custom-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "Custom HTTP headers to add to OpenAI client requests.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.dimensions",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.encoding-format",
+      "type": "org.springframework.ai.openai.OpenAiEmbeddingOptions$EncodingFormat",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.git-hub-models",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.max-retries",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retries for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "spring.ai.openai.embedding.metadata-mode",
+      "type": "org.springframework.ai.document.MetadataMode",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties",
+      "defaultValue": "embed"
+    },
+    {
+      "name": "spring.ai.openai.embedding.microsoft-deployment-name",
+      "type": "java.lang.String",
+      "description": "The deployment name as defined in Microsoft Foundry. On Microsoft Foundry, the default deployment name is the same as the model name. When using OpenAI directly, this value isn't used.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.microsoft-foundry",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.microsoft-foundry-service-version",
+      "type": "com.openai.azure.AzureOpenAIServiceVersion",
+      "description": "The Service version to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.organization-id",
+      "type": "java.lang.String",
+      "description": "The organization ID to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.proxy",
+      "type": "java.net.Proxy",
+      "description": "Proxy settings for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.embedding.timeout",
+      "type": "java.time.Duration",
+      "description": "Request timeout for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties",
+      "defaultValue": "60s"
+    },
+    {
+      "name": "spring.ai.openai.embedding.user",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties"
+    },
+    {
+      "name": "spring.ai.openai.git-hub-models",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.api-key",
+      "type": "java.lang.String",
+      "description": "The API key to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.base-url",
+      "type": "java.lang.String",
+      "description": "The deployment URL to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.connection-pool-metrics-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable connection pool metrics for the underlying OkHttp client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "spring.ai.openai.image.credential",
+      "type": "com.openai.credential.Credential",
+      "description": "Credentials used to connect to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.custom-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "Custom HTTP headers to add to OpenAI client requests.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.git-hub-models",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.height",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.max-retries",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retries for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "spring.ai.openai.image.microsoft-deployment-name",
+      "type": "java.lang.String",
+      "description": "The deployment name as defined in Microsoft Foundry. On Microsoft Foundry, the default deployment name is the same as the model name. When using OpenAI directly, this value isn't used.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.microsoft-foundry",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.microsoft-foundry-service-version",
+      "type": "com.openai.azure.AzureOpenAIServiceVersion",
+      "description": "The Service version to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.n",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.organization-id",
+      "type": "java.lang.String",
+      "description": "The organization ID to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.proxy",
+      "type": "java.net.Proxy",
+      "description": "Proxy settings for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.quality",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.response-format",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.size",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.style",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.timeout",
+      "type": "java.time.Duration",
+      "description": "Request timeout for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties",
+      "defaultValue": "60s"
+    },
+    {
+      "name": "spring.ai.openai.image.user",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.image.width",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties"
+    },
+    {
+      "name": "spring.ai.openai.max-retries",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retries for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "spring.ai.openai.microsoft-deployment-name",
+      "type": "java.lang.String",
+      "description": "The deployment name as defined in Microsoft Foundry. On Microsoft Foundry, the default deployment name is the same as the model name. When using OpenAI directly, this value isn't used.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.microsoft-foundry",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.microsoft-foundry-service-version",
+      "type": "com.openai.azure.AzureOpenAIServiceVersion",
+      "description": "The Service version to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.model",
+      "type": "java.lang.String",
+      "description": "The model name used. When using Microsoft Foundry, this is also used as the default deployment name.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.api-key",
+      "type": "java.lang.String",
+      "description": "The API key to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.base-url",
+      "type": "java.lang.String",
+      "description": "The deployment URL to connect to OpenAI.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.connection-pool-metrics-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable connection pool metrics for the underlying OkHttp client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "spring.ai.openai.moderation.credential",
+      "type": "com.openai.credential.Credential",
+      "description": "Credentials used to connect to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.custom-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "Custom HTTP headers to add to OpenAI client requests.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.git-hub-models",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.max-retries",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retries for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties",
+      "defaultValue": 3
+    },
+    {
+      "name": "spring.ai.openai.moderation.microsoft-deployment-name",
+      "type": "java.lang.String",
+      "description": "The deployment name as defined in Microsoft Foundry. On Microsoft Foundry, the default deployment name is the same as the model name. When using OpenAI directly, this value isn't used.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.microsoft-foundry",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.microsoft-foundry-service-version",
+      "type": "com.openai.azure.AzureOpenAIServiceVersion",
+      "description": "The Service version to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.organization-id",
+      "type": "java.lang.String",
+      "description": "The organization ID to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.proxy",
+      "type": "java.net.Proxy",
+      "description": "Proxy settings for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties"
+    },
+    {
+      "name": "spring.ai.openai.moderation.timeout",
+      "type": "java.time.Duration",
+      "description": "Request timeout for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties",
+      "defaultValue": "60s"
+    },
+    {
+      "name": "spring.ai.openai.organization-id",
+      "type": "java.lang.String",
+      "description": "The organization ID to use when connecting to Microsoft Foundry.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.proxy",
+      "type": "java.net.Proxy",
+      "description": "Proxy settings for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties"
+    },
+    {
+      "name": "spring.ai.openai.timeout",
+      "type": "java.time.Duration",
+      "description": "Request timeout for OpenAI client.",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiCommonProperties",
+      "defaultValue": "60s"
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.options.input",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.speech.input"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.options.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.speech.model"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.options.response-format",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.speech.response-format"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.options.speed",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.speech.speed"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.speech.options.voice",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.speech.voice"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.options.language",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.transcription.language"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.options.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.transcription.model"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.options.prompt",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.transcription.prompt"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.options.response-format",
+      "type": "com.openai.models.audio.AudioResponseFormat",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.transcription.response-format"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.options.temperature",
+      "type": "java.lang.Float",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.transcription.temperature"
+      }
+    },
+    {
+      "name": "spring.ai.openai.audio.transcription.options.timestamp-granularities",
+      "type": "java.util.List<com.openai.models.audio.transcriptions.TranscriptionCreateParams$TimestampGranularity>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.audio.transcription.timestamp-granularities"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.api-key",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.api-key"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.base-url",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.base-url"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.credential",
+      "type": "com.openai.credential.Credential",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.credential"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.custom-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.custom-headers"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.deployment-name"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.extra-body",
+      "type": "java.util.Map<java.lang.String,java.lang.Object>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.extra-body"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.frequency-penalty",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.frequency-penalty"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.git-hub-models",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.git-hub-models"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.logit-bias",
+      "type": "java.util.Map<java.lang.String,java.lang.Integer>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.logit-bias"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.logprobs",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.logprobs"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.max-completion-tokens",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.max-completion-tokens"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.max-retries",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.max-retries"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.max-tokens",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.max-tokens"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.metadata",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.metadata"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.microsoft-deployment-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.microsoft-deployment-name"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.microsoft-foundry",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.microsoft-foundry"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.microsoft-foundry-service-version",
+      "type": "com.openai.azure.AzureOpenAIServiceVersion",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.microsoft-foundry-service-version"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.model"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.n",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.n"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.organization-id",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.organization-id"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.output-audio",
+      "type": "org.springframework.ai.openai.OpenAiChatOptions$AudioParameters",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.output-audio"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.output-modalities",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.output-modalities"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.parallel-tool-calls",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.parallel-tool-calls"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.presence-penalty",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.presence-penalty"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.prompt-cache-key",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.prompt-cache-key"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.proxy",
+      "type": "java.net.Proxy",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.proxy"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.reasoning-effort",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.reasoning-effort"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.response-format",
+      "type": "org.springframework.ai.openai.OpenAiChatModel$ResponseFormat",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.response-format"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.seed",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.seed"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.service-tier",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.service-tier"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.stop",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.stop"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.store",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.store"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.stream-options",
+      "type": "org.springframework.ai.openai.OpenAiChatOptions$StreamOptions",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.stream-options"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.temperature",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.temperature"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.timeout",
+      "type": "java.time.Duration",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.timeout"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.top-logprobs",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.top-logprobs"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.top-p",
+      "type": "java.lang.Double",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.top-p"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.user",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.user"
+      }
+    },
+    {
+      "name": "spring.ai.openai.chat.options.verbosity",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiChatProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.chat.verbosity"
+      }
+    },
+    {
+      "name": "spring.ai.openai.embedding.options.dimensions",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.embedding.dimensions"
+      }
+    },
+    {
+      "name": "spring.ai.openai.embedding.options.encoding-format",
+      "type": "org.springframework.ai.openai.OpenAiEmbeddingOptions$EncodingFormat",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.embedding.encoding-format"
+      }
+    },
+    {
+      "name": "spring.ai.openai.embedding.options.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.embedding.model"
+      }
+    },
+    {
+      "name": "spring.ai.openai.embedding.options.user",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.embedding.user"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.height",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.height"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.model"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.n",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.n"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.quality",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.quality"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.response-format",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.response-format"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.size",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.size"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.style",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.style"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.user",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.user"
+      }
+    },
+    {
+      "name": "spring.ai.openai.image.options.width",
+      "type": "java.lang.Integer",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiImageProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.image.width"
+      }
+    },
+    {
+      "name": "spring.ai.openai.moderation.options.model",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationProperties$Options",
+      "deprecated": true,
+      "deprecation": {
+        "replacement": "spring.ai.openai.moderation.model"
+      }
+    }
+  ],
+  "hints": [],
+  "ignored": {
+    "properties": []
+  }
+}
