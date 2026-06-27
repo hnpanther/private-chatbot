@@ -83,7 +83,7 @@
                         <div class="overflow-hidden">
                             <div class="text-truncate small fw-medium" th:text="${s.title}"></div>
                             <div class="text-muted" style="font-size: 0.65rem;"
-                                 th:text="${#temporals.format(s.updatedAt, 'HH:mm - yyyy/MM/dd')}"></div>
+                                 th:text="${@shamsi.format(s.updatedAt)}"></div>
                         </div>
                     </a>
                 </div>
@@ -109,14 +109,17 @@
 
                     <div th:if="${messages != null}">
                         <div th:each="msg : ${messages}"
-                             th:class="${msg.role.name() == 'USER'} ? 'message user-message d-flex justify-content-end mb-3' : 'message ai-message d-flex justify-content-start mb-3'">
-                            <div th:if="${msg.role.name() == 'ASSISTANT'}" class="avatar-icon me-2">
+                             th:class="${msg.role.name() == 'USER'} ? 'message user-message d-flex justify-content-end align-items-end mb-3' : 'message ai-message d-flex justify-content-start align-items-end mb-3'">
+                            <div th:if="${msg.role.name() == 'ASSISTANT'}" class="avatar-icon me-2 flex-shrink-0">
                                 <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
                                     <i class="bi bi-robot small"></i>
                                 </div>
                             </div>
-                            <div class="message-bubble" th:text="${msg.content}"></div>
-                            <div th:if="${msg.role.name() == 'USER'}" class="avatar-icon ms-2">
+                            <div th:class="${msg.role.name() == 'USER'} ? 'd-flex flex-column align-items-end' : 'd-flex flex-column'">
+                                <div class="message-bubble" th:text="${msg.content}"></div>
+                                <small class="message-time" th:text="${@shamsi.format(msg.createdAt)}"></small>
+                            </div>
+                            <div th:if="${msg.role.name() == 'USER'}" class="avatar-icon ms-2 flex-shrink-0">
                                 <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;">
                                     <i class="bi bi-person small"></i>
                                 </div>
@@ -167,15 +170,40 @@
         if (area) area.scrollTop = area.scrollHeight;
     }
 
+    function toShamsi(date) {
+        const gy = date.getFullYear(), gm = date.getMonth() + 1, gd = date.getDate();
+        const gdn = [0,31,59,90,120,151,181,212,243,273,304,334];
+        const jdn = [0,31,62,93,124,155,186,216,246,276,306,337];
+        const gy2 = gm > 2 ? gy + 1 : gy;
+        let dayNo = 365*(gy-1600) + Math.floor((gy2-1601)/4) - Math.floor((gy2-1)/100) + Math.floor((gy2+299)/400)
+                    + gdn[gm-1] + gd - 1;
+        if (gm > 2 && ((gy%4===0 && gy%100!==0) || gy%400===0)) dayNo++;
+        let jDay = dayNo - 79;
+        const np = Math.floor(jDay / 12053); jDay %= 12053;
+        let jy = 979 + 33*np + 4*Math.floor(jDay/1461); jDay %= 1461;
+        if (jDay >= 366) { jy += Math.floor((jDay-1)/365); jDay = (jDay-1)%365; }
+        let jm = 0;
+        while (jm < 11 && jDay >= jdn[jm+1]) jm++;
+        const jd = jDay - jdn[jm] + 1;
+        const h = String(date.getHours()).padStart(2,'0');
+        const mi = String(date.getMinutes()).padStart(2,'0');
+        const raw = `${jy}/${String(jm+1).padStart(2,'0')}/${String(jd).padStart(2,'0')} - ${h}:${mi}`;
+        return raw.replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    }
+
     function appendMessage(role, content) {
         const area = document.getElementById('messagesArea');
         const isUser = role === 'USER';
+        const timeStr = toShamsi(new Date());
         const div = document.createElement('div');
-        div.className = `message ${isUser ? 'user-message d-flex justify-content-end' : 'ai-message d-flex justify-content-start'} mb-3`;
+        div.className = `message ${isUser ? 'user-message d-flex justify-content-end' : 'ai-message d-flex justify-content-start'} align-items-end mb-3`;
         div.innerHTML = `
-            ${!isUser ? `<div class="avatar-icon me-2"><div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="bi bi-robot small"></i></div></div>` : ''}
-            <div class="message-bubble">${escapeHtml(content)}</div>
-            ${isUser ? `<div class="avatar-icon ms-2"><div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="bi bi-person small"></i></div></div>` : ''}
+            ${!isUser ? `<div class="avatar-icon me-2 flex-shrink-0"><div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="bi bi-robot small"></i></div></div>` : ''}
+            <div class="d-flex flex-column ${isUser ? 'align-items-end' : ''}">
+                <div class="message-bubble">${escapeHtml(content)}</div>
+                <small class="message-time">${timeStr}</small>
+            </div>
+            ${isUser ? `<div class="avatar-icon ms-2 flex-shrink-0"><div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="bi bi-person small"></i></div></div>` : ''}
         `;
         area.insertBefore(div, document.getElementById('typingIndicator'));
         scrollToBottom();

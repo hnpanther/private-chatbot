@@ -50,26 +50,38 @@ public class AdminController {
         model.addAttribute("users", userService.findAll());
         model.addAttribute("roles", roleRepository.findAll());
         model.addAttribute("departments", adminService.getAllDepartments());
-        model.addAttribute("newUser", new UserCreateRequest());
         return "admin/users";
     }
 
     @PostMapping("/users/create")
-    public String createUser(@Valid @ModelAttribute("newUser") UserCreateRequest req,
-                             BindingResult br, RedirectAttributes ra, Model model) {
+    public String createUser(@Valid @ModelAttribute UserCreateRequest req,
+                             BindingResult br, RedirectAttributes ra) {
         log.info("POST /admin/users/create: username={}", req.getUsername());
         if (br.hasErrors()) {
             log.debug("Validation errors creating user: {}", br.getAllErrors());
-            model.addAttribute("users", userService.findAll());
-            model.addAttribute("roles", roleRepository.findAll());
-            model.addAttribute("departments", adminService.getAllDepartments());
-            return "admin/users";
+            ra.addFlashAttribute("error", "اطلاعات وارد شده معتبر نیست (نام کاربری، رمز عبور و نام کامل الزامی است)");
+            return "redirect:/admin/users";
         }
         try {
             userService.createUser(req);
-            ra.addFlashAttribute("success", "User created successfully");
+            ra.addFlashAttribute("success", "کاربر با موفقیت ایجاد شد");
         } catch (Exception e) {
             log.warn("Error creating user: username={}, error={}", req.getUsername(), e.getMessage());
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
+
+    @PostMapping("/users/{id}/update")
+    public String updateUser(@PathVariable Long id,
+                             @ModelAttribute UserCreateRequest req,
+                             RedirectAttributes ra) {
+        log.info("POST /admin/users/{}/update: fullName={}", id, req.getFullName());
+        try {
+            userService.updateUser(id, req);
+            ra.addFlashAttribute("success", "کاربر با موفقیت ویرایش شد");
+        } catch (Exception e) {
+            log.warn("Error updating user id={}: {}", id, e.getMessage());
             ra.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/admin/users";

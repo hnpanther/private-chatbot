@@ -122,19 +122,18 @@ public class UserService implements UserDetailsService {
             log.info("Password changed for user id={}", userId);
         }
 
-        if (req.getRoleIds() != null) {
-            Set<Role> roles = req.getRoleIds().stream()
-                    .map(id -> roleRepository.findById(id).orElseThrow())
-                    .collect(Collectors.toSet());
-            user.setRoles(roles);
-        }
+        // Always replace roles and departments so unchecking all boxes clears them.
+        Set<Long> roleIds = req.getRoleIds() != null ? req.getRoleIds() : Set.of();
+        user.setRoles(roleIds.stream()
+                .map(id -> roleRepository.findById(id).orElseThrow())
+                .collect(Collectors.toSet()));
+        log.debug("Roles updated for user id={}: {}", userId, roleIds);
 
-        if (req.getDepartmentIds() != null) {
-            Set<Department> departments = req.getDepartmentIds().stream()
-                    .map(id -> departmentRepository.findById(id).orElseThrow())
-                    .collect(Collectors.toSet());
-            user.setDepartments(departments);
-        }
+        Set<Long> deptIds = req.getDepartmentIds() != null ? req.getDepartmentIds() : Set.of();
+        user.setDepartments(deptIds.stream()
+                .map(id -> departmentRepository.findById(id).orElseThrow())
+                .collect(Collectors.toSet()));
+        log.debug("Departments updated for user id={}: {}", userId, deptIds);
 
         User saved = userRepository.save(user);
         log.info("User updated: id={}, username={}", saved.getId(), saved.getUsername());

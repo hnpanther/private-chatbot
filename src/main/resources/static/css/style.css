@@ -98,6 +98,14 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
+/* ===== Message timestamp ===== */
+.message-time {
+    font-size: 0.62rem;
+    color: #aab0cc;
+    margin-top: 0.2rem;
+    padding: 0 0.25rem;
+}
+
 /* ===== Typing animation ===== */
 .typing-dots span {
     display: inline-block;
