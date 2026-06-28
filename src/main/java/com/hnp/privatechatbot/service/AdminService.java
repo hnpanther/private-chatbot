@@ -90,6 +90,11 @@ public class AdminService {
     public void deleteChatBot(Long id) {
         log.info("Deleting chatbot: id={}", id);
         llmService.evictCache(id);
+        chatBotRepository.findById(id).ifPresent(chatBot -> {
+            List<com.hnp.privatechatbot.entity.ChatSession> sessions = sessionRepository.findByChatBot(chatBot);
+            sessionRepository.deleteAll(sessions);
+            log.info("Deleted {} session(s) for chatbot id={}", sessions.size(), id);
+        });
         chatBotRepository.deleteById(id);
         log.info("ChatBot deleted: id={}", id);
     }

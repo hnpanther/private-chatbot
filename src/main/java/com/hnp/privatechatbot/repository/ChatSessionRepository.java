@@ -19,4 +19,6 @@ public interface ChatSessionRepository extends JpaRepository<ChatSession, Long> 
 
     /** Ownership-checked lookup — prevents one user reading another's session. */
     Optional<ChatSession> findByIdAndUser(Long id, User user);
+
+    List<ChatSession> findByChatBot(ChatBot chatBot);
 }
