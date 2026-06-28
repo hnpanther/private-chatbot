@@ -59,6 +59,12 @@ public class LlmService {
     @Value("${spring.ai.openai.chat.model}")
     private String globalModel;
 
+    @Value("${spring.ai.ollama.base-url}")
+    private String globalOllamaBaseUrl;
+
+    @Value("${spring.ai.ollama.chat.model}")
+    private String globalOllamaModel;
+
     @Value("${app.rag.top-k:5}")
     private int ragTopK;
 
@@ -198,8 +204,8 @@ public class LlmService {
 
     /** Constructs a per-chatbot Ollama client pointing at the configured server URL. */
     private ChatClient buildOllamaClient(ChatBot chatBot) {
-        String baseUrl = nonBlank(chatBot.getLlmBaseUrl(), "http://localhost:11434");
-        String model   = nonBlank(chatBot.getLlmModel(),   "llama3");
+        String baseUrl = nonBlank(chatBot.getLlmBaseUrl(), globalOllamaBaseUrl);
+        String model   = nonBlank(chatBot.getLlmModel(),   globalOllamaModel);
 
         log.debug("Building Ollama client: chatbotId={}, baseUrl={}, model={}",
                 chatBot.getId(), baseUrl, model);
