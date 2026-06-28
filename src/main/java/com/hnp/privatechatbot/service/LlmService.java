@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -225,17 +226,26 @@ public class LlmService {
      */
     private String retrieveRagContext(ChatBot chatBot, String query) {
         try {
-            String filterKey = nonBlank(chatBot.getRagFilterKey(), String.valueOf(chatBot.getId()));
+            String rawKey = nonBlank(chatBot.getRagFilterKey(), String.valueOf(chatBot.getId()));
+            List<String> keys = Arrays.stream(rawKey.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+
             FilterExpressionBuilder b = new FilterExpressionBuilder();
+            var filterExpr = keys.size() == 1
+                    ? b.eq("chatbot_id", keys.get(0)).build()
+                    : b.in("chatbot_id", keys.toArray()).build();
+
             var results = vectorStore.similaritySearch(
                     SearchRequest.builder()
                             .query(query)
                             .topK(ragTopK)
-                            .filterExpression(b.eq("chatbot_id", filterKey).build())
+                            .filterExpression(filterExpr)
                             .build()
             );
             if (results == null || results.isEmpty()) {
-                log.debug("RAG: no documents found for chatbot id={}, key={}", chatBot.getId(), filterKey);
+                log.debug("RAG: no documents found for chatbot id={}, keys={}", chatBot.getId(), rawKey);
                 return "";
             }
             log.debug("RAG: {} document(s) retrieved for chatbot id={}", results.size(), chatBot.getId());
