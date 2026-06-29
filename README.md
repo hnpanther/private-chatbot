@@ -161,6 +161,186 @@ SET metadata = '{"chatbot_id": "hr"}'::jsonb
 WHERE metadata = '{}'::jsonb;
 ```
 
+### Embedding documents with n8n
+
+You can automate the ingestion pipeline using [n8n](https://n8n.io). The workflow below downloads a PDF, splits it into overlapping chunks, embeds each chunk via the embedding API, and inserts the result into `vector_store`.
+
+**Workflow steps:**
+
+```
+Manual Trigger
+  → Download a File   (HTTP GET — fetch the PDF from a URL)
+  → Extract from File (PDF → plain text)
+  → Create chunks     (JS: 800-char chunks, 100-char overlap)
+  → Loop Over Items
+      → Embedding a chunk  (POST to embedding API)
+      → Prepare data       (format content + metadata + embedding vector)
+      → Insert data        (INSERT INTO vector_store)
+      → (back to loop)
+```
+
+**Key settings to adjust before running:**
+
+| Node | What to set |
+|------|-------------|
+| Download a File | URL of the PDF to ingest |
+| Embedding a chunk → Authorization header | Your embedding API key (`apikey ...` or `Bearer ...`) |
+| Embedding a chunk → `model` | Your embedding model name |
+| Embedding a chunk → `dimensions` | Must match `PGVECTOR_DIMENSIONS` (default `1024`) |
+| Prepare data → `chatbot_id` | Tags that control which chatbots can search this document |
+| Insert data | PostgreSQL credentials pointing to `chatbot_db` |
+
+**Metadata in the Prepare data node:**
+
+```javascript
+return {
+  content: content,
+  metadata: {
+    chatbot_id: ["hr", "contract"],  // JSON array — supported natively
+    source: "my-file.pdf"
+  },
+  embedding: `[${embedding.join(',')}]`
+};
+```
+
+<details>
+<summary>Import this workflow into n8n (click to expand JSON)</summary>
+
+```json
+{
+  "name": "Embed PDF into pgVector",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [160, -16],
+      "id": "30d78f2c-417e-45af-9c60-8d8004df4d35",
+      "name": "When clicking Execute workflow"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [528, -192],
+      "id": "bb3cd1de-3086-4644-bf2d-b43c95f657a8",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [448, 48],
+      "id": "f1af8f5b-6db9-460b-afad-82effc5d5e79",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "file url...",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [352, -192],
+      "id": "0b423142-8f2d-4ae4-ab45-6c03204a6a75",
+      "name": "Download a File"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.text;\n\nconst chunkSize = 800;\nconst overlap = 100;\n\nconst items = [];\n\nfor (let i = 0; i < text.length; i += (chunkSize - overlap)) {\n  const chunk = text.substring(i, i + chunkSize);\n\n  if (chunk.trim()) {\n    items.push({\n      json: {\n        chunk,\n        chunkIndex: items.length\n      }\n    });\n  }\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [704, -192],
+      "id": "4b2ad51f-fde4-419c-a781-12b3122a4ef8",
+      "name": "Create chunks"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "embed model...",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "apikey YOUR_KEY_HERE"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"your-embedding-model\",\n  \"input\": {{ JSON.stringify($json.chunk) }},\n  \"dimensions\": 1024\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [672, 64],
+      "id": "5bc75988-1e41-455d-8c0e-ea0085379f5b",
+      "name": "Embedding a chunk"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const content = $('Loop Over Items').item.json.chunk;\nconst embedding = $json.data[0].embedding;\n\nreturn {\n  content: content,\n  metadata: {\n    chatbot_id: [\"hr\", \"contract\"],\n    source: \"my-file.pdf\"\n  },\n  embedding: `[${embedding.join(',')}]`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 64],
+      "id": "1b5c150c-78db-4737-afbc-23d425d80e63",
+      "name": "Prepare data for database"
+    },
+    {
+      "parameters": {
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "vector_store", "mode": "list", "cachedResultName": "vector_store" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "content": "={{ $json.content }}",
+            "metadata": "={{ $json.metadata }}",
+            "embedding": "={{ $json.embedding }}"
+          },
+          "matchingColumns": ["id"],
+          "schema": [
+            { "id": "id", "displayName": "id", "required": false, "defaultMatch": true, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "content", "displayName": "content", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "metadata", "displayName": "metadata", "required": false, "defaultMatch": false, "display": true, "type": "object", "canBeUsedToMatch": true },
+            { "id": "embedding", "displayName": "embedding", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1056, 64],
+      "id": "a9a5a2bb-bfd0-4603-81a0-902376364308",
+      "name": "Insert data"
+    }
+  ],
+  "connections": {
+    "When clicking Execute workflow": { "main": [[{ "node": "Download a File", "type": "main", "index": 0 }]] },
+    "Download a File": { "main": [[{ "node": "Extract from File", "type": "main", "index": 0 }]] },
+    "Extract from File": { "main": [[{ "node": "Create chunks", "type": "main", "index": 0 }]] },
+    "Create chunks": { "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]] },
+    "Loop Over Items": { "main": [[], [{ "node": "Embedding a chunk", "type": "main", "index": 0 }]] },
+    "Embedding a chunk": { "main": [[{ "node": "Prepare data for database", "type": "main", "index": 0 }]] },
+    "Prepare data for database": { "main": [[{ "node": "Insert data", "type": "main", "index": 0 }]] },
+    "Insert data": { "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
+```
+
+To import: open n8n → **Workflows** → **Import from file / clipboard** → paste the JSON above.
+
+</details>
+
 ## LLM Configuration
 
 Each chatbot has an `LlmProvider` setting:
