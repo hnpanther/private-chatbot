@@ -138,6 +138,23 @@ class AdminServiceTest {
     }
 
     @Test
+    void deleteChatBot_withExistingSessions_deletesSessionsBeforeBot() {
+        com.hnp.privatechatbot.entity.ChatSession s1 = new com.hnp.privatechatbot.entity.ChatSession();
+        com.hnp.privatechatbot.entity.ChatSession s2 = new com.hnp.privatechatbot.entity.ChatSession();
+        List<com.hnp.privatechatbot.entity.ChatSession> sessions = List.of(s1, s2);
+
+        when(chatBotRepository.findById(10L)).thenReturn(Optional.of(bot));
+        when(sessionRepository.findByChatBot(bot)).thenReturn(sessions);
+
+        adminService.deleteChatBot(10L);
+
+        verify(sessionRepository).findByChatBot(bot);
+        verify(sessionRepository).deleteAll(sessions);
+        verify(llmService).evictCache(10L);
+        verify(chatBotRepository).deleteById(10L);
+    }
+
+    @Test
     void toggleChatBotActive_fromActive_setsInactive() {
         bot.setActive(true);
         when(chatBotRepository.findById(10L)).thenReturn(Optional.of(bot));

@@ -135,4 +135,32 @@ class ChatSessionRepositoryTest {
 
         assertThat(result).hasSize(2);
     }
+
+    @Test
+    void findByChatBot_returnsAllSessionsForThatBot() {
+        // All three sessions (alice×2, bob×1) belong to the same bot
+        List<ChatSession> result = sessionRepository.findByChatBot(bot);
+
+        assertThat(result).hasSize(3);
+    }
+
+    @Test
+    void findByChatBot_doesNotReturnSessionsForOtherBot() {
+        // A second bot with no sessions should return empty
+        com.hnp.privatechatbot.entity.Department dept2 = new com.hnp.privatechatbot.entity.Department();
+        dept2.setName("Other Dept");
+        em.persist(dept2);
+
+        ChatBot otherBot = new ChatBot();
+        otherBot.setName("Other Bot");
+        otherBot.setActive(true);
+        otherBot.setDepartment(dept2);
+        em.persist(otherBot);
+        em.flush();
+        em.clear();
+
+        List<ChatSession> result = sessionRepository.findByChatBot(otherBot);
+
+        assertThat(result).isEmpty();
+    }
 }

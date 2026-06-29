@@ -1,6 +1,6 @@
 /* ===== Global ===== */
 * {
-    font-family: 'Vazirmatn', sans-serif;
+    font-family: 'Vazirmatn', Tahoma, 'Segoe UI', Arial, sans-serif;
 }
 
 body {
@@ -69,6 +69,19 @@ body {
     border-color: #9fa8da;
 }
 
+/* ===== Session delete button ===== */
+.session-delete-btn {
+    opacity: 0;
+    transition: opacity 0.15s;
+    line-height: 1;
+    width: 26px;
+    height: 26px;
+}
+
+.session-item-row:hover .session-delete-btn {
+    opacity: 1;
+}
+
 /* ===== Messages ===== */
 .messages-area {
     background-color: #fafbff;
@@ -87,14 +100,14 @@ body {
 .user-message .message-bubble {
     background-color: #3f51b5;
     color: #fff;
-    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
 }
 
 .ai-message .message-bubble {
     background-color: #fff;
     color: #222;
     border: 1px solid #e0e3f0;
-    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
