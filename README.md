@@ -354,6 +354,167 @@ To import: open n8n → **Workflows** → **Import from file / clipboard** → p
 
 </details>
 
+If you are using **Ollama for embeddings**, the workflow below uses the local Ollama API instead of a cloud endpoint — no API key required.
+It also includes **Farsi text normalization** (Arabic letter unification, diacritic removal, ZWNJ cleanup) and **sentence-aware chunking** for better retrieval quality on Persian documents.
+
+Key differences from the OpenAI-compatible workflow:
+
+| | OpenAI-compatible | Ollama |
+|---|---|---|
+| Embedding URL | `https://your-api/v1/embeddings` | `http://localhost:11434/api/embeddings` |
+| Request field | `"input"` | `"prompt"` |
+| Response field | `$json.data[0].embedding` | `$json.embedding` |
+| Authorization | required | not needed |
+| Chunking | character-based | sentence-aware + Farsi normalization |
+
+<details>
+<summary>Import Ollama workflow into n8n (click to expand JSON)</summary>
+
+```json
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [160, -16],
+      "id": "4c1be6c1-2afe-4ab1-b61e-613164224488",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [528, -192],
+      "id": "ac8fddff-26bd-4b2e-aa15-ca262b1adcfd",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [448, 48],
+      "id": "662ec191-f0bd-4845-a450-e432bce09f0f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "https://drive.google.com/uc?export=download&id=...",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [352, -192],
+      "id": "68fa1261-b333-4fea-abc4-6dd45587eb97",
+      "name": "Download a File"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.text;\n\nconst CHUNK_SIZE = 500;   // characters — lower this for more precise matching\nconst OVERLAP = 80;\n\n// ---------- Farsi normalization ----------\nfunction normalizeFarsi(input) {\n  if (!input) return \"\";\n  return input\n    // Arabic letters → Farsi\n    .replace(/ك/g, \"ک\")\n    .replace(/[يىئ]/g, \"ی\")            // Arabic yeh, alef maksura, yeh with hamza\n    .replace(/ة/g, \"ه\")               // teh marbuta\n    .replace(/[أإآ]/g, \"ا\")           // alef variants with hamza\n    .replace(/ؤ/g, \"و\")\n    .replace(/\\u0640/g, \"\")           // tatweel (kashida ـ)\n    // remove diacritics / harakat\n    .replace(/[\\u064B-\\u0652\\u0670\\u0653-\\u0655]/g, \"\")\n    // Arabic digits → Farsi (Latin digits left untouched for technical names)\n    .replace(/[\\u0660-\\u0669]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 0x06F0))\n    // normalize ZWNJ: trim spaces around it and collapse repeats\n    .replace(/[ \\t]*\\u200C[ \\t]*/g, \"\\u200C\")\n    .replace(/\\u200C{2,}/g, \"\\u200C\")\n    // collapse whitespace (except newlines)\n    .replace(/[^\\S\\n]+/g, \" \")\n    .trim();\n}\n// -----------------------------------------\n\nconst clean = normalizeFarsi(text);\n\n// Sentence boundaries: period, Farsi/Latin question & exclamation, ellipsis, semicolon, newline\nconst sentences = clean\n  .split(/(?<=[.!?؟…؛\\n])\\s*/)\n  .map(s => s.trim())\n  .filter(Boolean);\n\nconst items = [];\nlet chunk = \"\";\n\nconst push = (c) => {\n  const t = c.trim();\n  if (t) items.push(t);\n};\n\nfor (const s of sentences) {\n  // Force-split a sentence longer than the chunk size\n  if (s.length > CHUNK_SIZE) {\n    push(chunk);\n    chunk = \"\";\n    for (let i = 0; i < s.length; i += CHUNK_SIZE - OVERLAP) {\n      push(s.slice(i, i + CHUNK_SIZE));\n    }\n    continue;\n  }\n\n  if ((chunk + \" \" + s).length > CHUNK_SIZE) {\n    push(chunk);\n    chunk = chunk.slice(-OVERLAP) + \" \" + s;  // carry overlap\n  } else {\n    chunk = chunk ? chunk + \" \" + s : s;\n  }\n}\npush(chunk);\n\n// Output with metadata\nreturn items.map((chunk, index) => ({\n  json: { chunk, index, length: chunk.length }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [704, -192],
+      "id": "0f7104f7-2eeb-4c74-af25-828c4b64efd5",
+      "name": "Create chunks"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:11434/api/embeddings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{}]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"bge-m3\",\n  \"prompt\": {{ JSON.stringify($json.chunk) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [704, 48],
+      "id": "48222cdb-2376-49cf-98d6-0b463f9fe73c",
+      "name": "Embedding a chunk",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\n\nconst content = $('Loop Over Items').item.json.chunk\n\nconst embedding = $json.embedding;\n\nreturn {\n  content: content,\n   metadata: {\n    chatbot_id: [\"contract\", \"hr\"],\n    source: \"my-file.pdf\"\n  },\n  embedding: `[${embedding.join(',')}]`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [912, 48],
+      "id": "595c96b5-d6d1-44b1-a31c-e1db39aa6916",
+      "name": "Prepare data for database"
+    },
+    {
+      "parameters": {
+        "schema": { "__rl": true, "mode": "list", "value": "public" },
+        "table": { "__rl": true, "value": "vector_store", "mode": "list", "cachedResultName": "vector_store" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "content": "={{ $json.content }}",
+            "metadata": "={{ $json.metadata }}",
+            "embedding": "={{ $json.embedding }}"
+          },
+          "matchingColumns": ["id"],
+          "schema": [
+            { "id": "id", "displayName": "id", "required": false, "defaultMatch": true, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "content", "displayName": "content", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "metadata", "displayName": "metadata", "required": false, "defaultMatch": false, "display": true, "type": "object", "canBeUsedToMatch": true },
+            { "id": "embedding", "displayName": "embedding", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [1120, 48],
+      "id": "39210496-dcfb-4579-aaa9-30ddc998207f",
+      "name": "Insert data"
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": { "main": [[{ "node": "Download a File", "type": "main", "index": 0 }]] },
+    "Download a File": { "main": [[{ "node": "Extract from File", "type": "main", "index": 0 }]] },
+    "Extract from File": { "main": [[{ "node": "Create chunks", "type": "main", "index": 0 }]] },
+    "Create chunks": { "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]] },
+    "Loop Over Items": { "main": [[], [{ "node": "Embedding a chunk", "type": "main", "index": 0 }]] },
+    "Embedding a chunk": { "main": [[{ "node": "Prepare data for database", "type": "main", "index": 0 }]] },
+    "Prepare data for database": { "main": [[{ "node": "Insert data", "type": "main", "index": 0 }]] },
+    "Insert data": { "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
+```
+
+**Key settings to adjust before running:**
+
+| Node | What to set |
+|------|-------------|
+| Download a File | URL of the PDF to ingest |
+| Embedding a chunk → `url` | Ollama base URL if not running locally (default: `http://localhost:11434/api/embeddings`) |
+| Embedding a chunk → `model` | Your pulled Ollama embedding model (e.g. `bge-m3`, `nomic-embed-text`, `mxbai-embed-large`) |
+| Create chunks → `CHUNK_SIZE` | Characters per chunk (default: 500) |
+| Prepare data → `chatbot_id` | Tags that control which chatbots can search this document |
+| Insert data | PostgreSQL credentials pointing to `chatbot_db` |
+
+> Make sure `PGVECTOR_DIMENSIONS` matches your model's output dimension (e.g. `bge-m3` → 1024, `nomic-embed-text` → 768).
+
+To import: open n8n → **Workflows** → **Import from file / clipboard** → paste the JSON above.
+
+</details>
+
 ## LLM Configuration
 
 There are two independent LLM concerns in this application:
