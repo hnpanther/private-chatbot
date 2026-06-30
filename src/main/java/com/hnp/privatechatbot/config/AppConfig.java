@@ -2,8 +2,13 @@ package com.hnp.privatechatbot.config;
 
 import com.openai.client.OpenAIClientImpl;
 import com.openai.core.ClientOptions;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.ollama.OllamaEmbeddingModel;
+import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
@@ -25,11 +30,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * ChatModel bean.  Ollama auto-configurations are excluded in application.properties;
  * per-chatbot Ollama clients are built programmatically in LlmService instead.
  *
- * EmbeddingModel is built manually so that providers like ArvanCloud that use a
- * different base-url and "apikey" Authorization scheme are handled correctly.
- * Spring AI's auto-configured bean does not apply the interceptor, so we replace it.
+ * EmbeddingModel is built manually to support two providers (OPENAI_COMPATIBLE / OLLAMA)
+ * selected by the AI_EMBEDDING_PROVIDER env var.  The OpenAI path also handles the
+ * "apikey <key>" Authorization scheme used by ArvanCloud and similar providers.
  */
 @Configuration
+@Slf4j
 public class AppConfig {
 
     @Value("${spring.ai.openai.base-url}")
@@ -38,8 +44,26 @@ public class AppConfig {
     @Value("${spring.ai.openai.api-key}")
     private String globalApiKey;
 
+    @Value("${spring.ai.openai.chat.model}")
+    private String globalChatModel;
+
+    @Value("${spring.ai.openai.chat.max-completion-tokens:3000}")
+    private int globalMaxTokens;
+
+    @Value("${spring.ai.openai.chat.temperature:0.7}")
+    private double globalTemperature;
+
+    @Value("${spring.ai.ollama.base-url}")
+    private String globalOllamaBaseUrl;
+
+    @Value("${spring.ai.ollama.chat.model}")
+    private String globalOllamaModel;
+
     @Value("${spring.ai.openai.embedding.model}")
-    private String embeddingModel;
+    private String embeddingModelName;
+
+    @Value("${app.embedding.provider:OPENAI_COMPATIBLE}")
+    private String embeddingProvider;
 
     @Value("${app.embedding.base-url:}")
     private String embeddingBaseUrl;
@@ -49,6 +73,48 @@ public class AppConfig {
 
     @Value("${spring.ai.vectorstore.pgvector.dimensions:1024}")
     private int embeddingDimensions;
+
+    @PostConstruct
+    public void logStartupConfig() {
+        log.info("=== Chat configuration ===");
+        log.info("  Global provider : OPENAI_COMPATIBLE");
+        log.info("  Base URL        : {}", globalBaseUrl);
+        log.info("  API key         : {}", maskKey(globalApiKey));
+        log.info("  Model           : {}", globalChatModel);
+        log.info("  Max tokens      : {}", globalMaxTokens);
+        log.info("  Temperature     : {}", globalTemperature);
+        log.info("  Ollama base URL : {}", globalOllamaBaseUrl);
+        log.info("  Ollama model    : {}", globalOllamaModel);
+
+        log.info("=== Embedding configuration ===");
+        log.info("  Provider        : {}", embeddingProvider.toUpperCase());
+        if ("OLLAMA".equalsIgnoreCase(embeddingProvider.trim())) {
+            String url = nonBlank(embeddingBaseUrl, globalOllamaBaseUrl);
+            log.info("  Base URL        : {}", url);
+            log.info("  Model           : {}", embeddingModelName);
+        } else {
+            String url = nonBlank(embeddingBaseUrl, globalBaseUrl);
+            String key = nonBlank(embeddingApiKey, globalApiKey);
+            log.info("  Base URL        : {}", url);
+            log.info("  API key         : {}", maskKey(key));
+            log.info("  Model           : {}", embeddingModelName);
+        }
+        log.info("  Vector dimensions: {}", embeddingDimensions);
+    }
+
+    /** Shows only the prefix and first 6 chars of the key — enough to identify it, not enough to leak it. */
+    private String maskKey(String key) {
+        if (key == null || key.isBlank()) return "(not set)";
+        if (key.startsWith("apikey ")) {
+            String bare = key.substring(7);
+            return "apikey " + (bare.length() > 6 ? bare.substring(0, 6) + "***" : "***");
+        }
+        if (key.startsWith("Bearer ")) {
+            String bare = key.substring(7);
+            return "Bearer " + (bare.length() > 6 ? bare.substring(0, 6) + "***" : "***");
+        }
+        return key.length() > 6 ? key.substring(0, 6) + "***" : "***";
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,13 +127,20 @@ public class AppConfig {
     }
 
     /**
-     * Custom EmbeddingModel that supports "apikey <key>" Authorization headers
-     * and a separate base-url for embedding endpoints (e.g. ArvanCloud).
-     * Falls back to the global chat API settings when embedding-specific ones are absent.
+     * Builds the global EmbeddingModel based on AI_EMBEDDING_PROVIDER:
+     *   OPENAI_COMPATIBLE (default) — supports apikey/Bearer header + separate base URL
+     *   OLLAMA                      — connects to the Ollama /api/embed endpoint
      */
     @Bean
     @Primary
     public EmbeddingModel embeddingModel() {
+        if ("OLLAMA".equalsIgnoreCase(embeddingProvider.trim())) {
+            return buildOllamaEmbeddingModel();
+        }
+        return buildOpenAiEmbeddingModel();
+    }
+
+    private EmbeddingModel buildOpenAiEmbeddingModel() {
         String baseUrl   = nonBlank(embeddingBaseUrl, globalBaseUrl);
         String storedKey = nonBlank(embeddingApiKey,  globalApiKey);
 
@@ -104,8 +177,24 @@ public class AppConfig {
         return OpenAiEmbeddingModel.builder()
                 .openAiClient(impl)
                 .options(OpenAiEmbeddingOptions.builder()
-                        .model(embeddingModel)
+                        .model(embeddingModelName)
                         .dimensions(embeddingDimensions)
+                        .build())
+                .build();
+    }
+
+    // AI_EMBEDDING_BASE_URL falls back to OLLAMA_BASE_URL; model comes from AI_EMBEDDING_MODEL
+    private EmbeddingModel buildOllamaEmbeddingModel() {
+        String baseUrl = nonBlank(embeddingBaseUrl, globalOllamaBaseUrl);
+
+        OllamaApi ollamaApi = OllamaApi.builder()
+                .baseUrl(baseUrl)
+                .build();
+
+        return OllamaEmbeddingModel.builder()
+                .ollamaApi(ollamaApi)
+                .options(OllamaEmbeddingOptions.builder()
+                        .model(embeddingModelName)
                         .build())
                 .build();
     }

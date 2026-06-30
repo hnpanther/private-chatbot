@@ -60,8 +60,9 @@ Fix: use `th:data-*` attributes + plain `onclick="fn(this)"` JavaScript.
 `AppConfig` provides three beans:
 1. `PasswordEncoder` — BCrypt, avoids circular dependency
 2. `ChatClient` — wraps the auto-configured `OpenAiChatModel`, explicitly typed to avoid Ollama ambiguity
-3. `EmbeddingModel` (`@Primary`) — custom-built to support `apikey` Authorization prefix and a separate
-   embedding endpoint (e.g. ArvanCloud uses a different host for embeddings); falls back to global settings
+3. `EmbeddingModel` (`@Primary`) — branches on `AI_EMBEDDING_PROVIDER`:
+   - `OPENAI_COMPATIBLE` (default): `OpenAiEmbeddingModel` with apikey interceptor + separate base URL support
+   - `OLLAMA`: `OllamaEmbeddingModel` using `AI_EMBEDDING_BASE_URL` (falls back to `OLLAMA_BASE_URL`)
 
 ### Per-Chatbot LLM Client Cache
 `LlmService` holds a `ConcurrentHashMap<Long, ChatClient>`.
@@ -208,9 +209,10 @@ src/test/java/com/hnp/privatechatbot/
 | `AI_CHAT_MODEL`        | *(none — must set)*                              | Chat model name as returned by the provider |
 | `AI_MAX_TOKENS`        | `3000`                                           | Max completion tokens per response |
 | `AI_TEMPERATURE`       | `0.7`                                            | Sampling temperature (0=deterministic, 1=creative) |
-| `AI_EMBEDDING_BASE_URL`| *(falls back to `AI_BASE_URL`)*                  | **Embedding API base URL. Must end with `/v1`.** Set separately when embedding uses a different host. |
-| `AI_EMBEDDING_API_KEY` | *(falls back to `AI_API_KEY`)*                   | Embedding API key. Same `apikey`/`Bearer` prefix rules. |
-| `AI_EMBEDDING_MODEL`   | `text-embedding-ada-002`                         | Embedding model name |
+| `AI_EMBEDDING_PROVIDER`| `OPENAI_COMPATIBLE`                              | Embedding backend: `OPENAI_COMPATIBLE` or `OLLAMA` |
+| `AI_EMBEDDING_BASE_URL`| *(falls back to `AI_BASE_URL` or `OLLAMA_BASE_URL`)* | Embedding API base URL. OpenAI-compatible must end with `/v1`. Ollama falls back to `OLLAMA_BASE_URL`. |
+| `AI_EMBEDDING_API_KEY` | *(falls back to `AI_API_KEY`)*                   | Embedding API key (OpenAI-compatible only). Same `apikey`/`Bearer` prefix rules. |
+| `AI_EMBEDDING_MODEL`   | `text-embedding-ada-002`                         | Embedding model name. For Ollama use e.g. `nomic-embed-text`. |
 | `PGVECTOR_DIMENSIONS`  | `1024`                                           | **Must match the output dimension of your embedding model.** Changing requires recreating `vector_store` table. |
 | `OLLAMA_BASE_URL`      | `http://localhost:11434`                         | Global Ollama base URL (per-chatbot URL overrides this) |
 | `OLLAMA_MODEL`         | `llama3`                                         | Default Ollama model |

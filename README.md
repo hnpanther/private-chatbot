@@ -83,9 +83,10 @@ Default credentials (change immediately in production):
 | `AI_CHAT_MODEL`         | `DeepSeek-R1-qwen-7b-awq`                       | Chat model name as returned by the provider |
 | `AI_MAX_TOKENS`         | `3000`                                           | Maximum tokens the model can generate per response |
 | `AI_TEMPERATURE`        | `0.7`                                            | Sampling temperature (0 = deterministic, 1 = more creative) |
-| `AI_EMBEDDING_BASE_URL` | *(falls back to `AI_BASE_URL`)*                  | **Embedding API base URL. Must end with `/v1`.** Many providers (ArvanCloud, etc.) use a different host for embeddings. Example: `https://api.arvancloud.ir/ai/v1` |
-| `AI_EMBEDDING_API_KEY`  | *(falls back to `AI_API_KEY`)*                   | Embedding API key. Same `apikey`/`Bearer` prefix rules as `AI_API_KEY`. |
-| `AI_EMBEDDING_MODEL`    | `text-embedding-ada-002`                         | Embedding model name. Must match the model available at `AI_EMBEDDING_BASE_URL`. |
+| `AI_EMBEDDING_PROVIDER` | `OPENAI_COMPATIBLE`                              | Embedding backend: `OPENAI_COMPATIBLE` or `OLLAMA` |
+| `AI_EMBEDDING_BASE_URL` | *(falls back to `AI_BASE_URL` or `OLLAMA_BASE_URL`)* | Embedding API base URL. For OpenAI-compatible **must end with `/v1`**. For Ollama falls back to `OLLAMA_BASE_URL`. |
+| `AI_EMBEDDING_API_KEY`  | *(falls back to `AI_API_KEY`)*                   | Embedding API key (OpenAI-compatible only). Same `apikey`/`Bearer` prefix rules. |
+| `AI_EMBEDDING_MODEL`    | `text-embedding-ada-002`                         | Embedding model name. For Ollama use e.g. `nomic-embed-text`. |
 | `PGVECTOR_DIMENSIONS`   | `1024`                                           | **Must match the output dimension of your embedding model.** Common values: 1024, 1536, 3072. Changing this requires recreating the `vector_store` table. |
 | `OLLAMA_BASE_URL`       | `http://localhost:11434`                         | Base URL for the global Ollama instance (used when chatbot provider is OLLAMA and no per-bot URL is set) |
 | `OLLAMA_MODEL`          | `llama3`                                         | Default Ollama model name |
@@ -96,17 +97,29 @@ Default credentials (change immediately in production):
 
 ### URL format — important
 
-The Spring AI OpenAI client SDK appends the path suffix automatically:
-- Chat: `<AI_BASE_URL>/chat/completions`
-- Embeddings: `<AI_EMBEDDING_BASE_URL>/embeddings`
+Path suffixes are appended automatically — never include them in the env vars:
 
-**Always set base URLs ending with `/v1`**, for example:
-```
+| Variable | SDK appends | Correct value example |
+|---|---|---|
+| `AI_BASE_URL` | `/chat/completions` | `https://api.arvancloud.ir/ai/v1` |
+| `AI_EMBEDDING_BASE_URL` (OpenAI-compatible) | `/embeddings` | `https://api.arvancloud.ir/ai/v1` |
+| `AI_EMBEDDING_BASE_URL` (Ollama) | `/api/embed` | `http://localhost:11434` |
+| `OLLAMA_BASE_URL` | `/api/embed` | `http://localhost:11434` |
+
+**OpenAI-compatible URLs must end with `/v1`.** Ollama URLs must be host + port only — no path.
+
+Common mistakes:
+```bash
+# Wrong — includes the path
+AI_EMBEDDING_BASE_URL=http://localhost:11434/api/embeddings   # → 404
+
+# Wrong — missing /v1
+AI_BASE_URL=https://api.arvancloud.ir/ai                      # → 404
+
+# Correct
+AI_EMBEDDING_BASE_URL=http://localhost:11434
 AI_BASE_URL=https://api.arvancloud.ir/ai/v1
-AI_EMBEDDING_BASE_URL=https://api.arvancloud.ir/ai/v1
 ```
-
-Do **not** include `/chat/completions` or `/embeddings` in the URL.
 
 ## RAG (Retrieval-Augmented Generation)
 
@@ -343,21 +356,162 @@ To import: open n8n → **Workflows** → **Import from file / clipboard** → p
 
 ## LLM Configuration
 
-Each chatbot has an `LlmProvider` setting:
+There are two independent LLM concerns in this application:
 
-| Provider           | Description |
-|--------------------|-------------|
-| **GLOBAL**         | Uses the global endpoint from `AI_BASE_URL` / `AI_API_KEY` |
-| **OPENAI_COMPATIBLE** | Uses a per-chatbot base URL, API key, and model name |
-| **OLLAMA**         | Connects to a local Ollama instance using the per-chatbot URL and model |
+- **Chat model** — answers user messages; configured per-chatbot in the admin panel
+- **Embedding model** — converts text to vectors for RAG; configured globally via env vars
+
+---
+
+### Chat model — per-chatbot providers
+
+Each chatbot in the admin panel has an **LLM Provider** dropdown with three options:
+
+| Provider | What it does |
+|---|---|
+| **GLOBAL** | Uses the shared endpoint defined in `AI_BASE_URL` / `AI_API_KEY` / `AI_CHAT_MODEL` |
+| **OPENAI_COMPATIBLE** | Uses a custom endpoint specified in the chatbot's own Base URL / API Key / Model fields |
+| **OLLAMA** | Connects to a local or remote Ollama server using the chatbot's URL and model fields |
+
+For **GLOBAL** chatbots, configure the shared endpoint with these env vars:
+
+```bash
+AI_BASE_URL=https://api.arvancloud.ir/ai/v1   # must end with /v1
+AI_API_KEY=apikey 283de96a-...               # your key (see API key format below)
+AI_CHAT_MODEL=DeepSeek-R1-distill-qwen-32b   # exact model name from the provider
+AI_MAX_TOKENS=3000                            # max tokens per response (default: 3000)
+AI_TEMPERATURE=0.7                            # 0 = deterministic, 1 = creative (default: 0.7)
+```
+
+For **OLLAMA** chatbots, configure the default Ollama server:
+
+```bash
+OLLAMA_BASE_URL=http://localhost:11434   # Ollama server address (default: localhost:11434)
+OLLAMA_MODEL=llama3                      # default model if not set per-chatbot
+```
+
+Each chatbot with provider **OPENAI_COMPATIBLE** or **OLLAMA** can override all fields (URL, key, model)
+directly in the admin panel — no env vars needed for those specific chatbots.
+
+---
 
 ### API key format
 
-| Provider    | Key format in admin panel              |
-|-------------|----------------------------------------|
-| ArvanCloud  | `apikey 283de96a-b069-565e-bcf6-...`   |
-| OpenAI      | `sk-...` (bare key)                    |
-| Local/other | `Bearer sk-...` or bare key            |
+The app supports multiple Authorization header formats. Store the **full value** in the API Key field:
+
+| Provider | Format | Example |
+|---|---|---|
+| ArvanCloud | `apikey <key>` | `apikey 283de96a-b069-565e-bcf6-...` |
+| Standard OpenAI / OpenAI-compatible | bare key | `sk-proj-...` |
+| Explicit Bearer | `Bearer <key>` | `Bearer sk-proj-...` |
+
+A bare key without a prefix is automatically sent as `Bearer <key>`.
+
+---
+
+### Embedding model
+
+The embedding model is used globally for RAG document search. It is selected by `AI_EMBEDDING_PROVIDER`:
+
+#### Option A — OpenAI-compatible (default)
+
+Use any OpenAI-compatible `/v1/embeddings` endpoint:
+
+```bash
+AI_EMBEDDING_PROVIDER=OPENAI_COMPATIBLE   # default, can be omitted
+
+# If your embedding endpoint is the same host as chat:
+AI_EMBEDDING_MODEL=text-embedding-ada-002
+
+# If your embedding endpoint is a different host (e.g. ArvanCloud separate URL):
+AI_EMBEDDING_BASE_URL=https://api.arvancloud.ir/ai/v1
+AI_EMBEDDING_API_KEY=apikey 283de96a-...
+AI_EMBEDDING_MODEL=Embedding-3-Small
+
+PGVECTOR_DIMENSIONS=1024   # must match the model's output dimension
+```
+
+If `AI_EMBEDDING_BASE_URL` is not set, it falls back to `AI_BASE_URL`.
+If `AI_EMBEDDING_API_KEY` is not set, it falls back to `AI_API_KEY`.
+
+#### Option B — Ollama
+
+Use a locally running Ollama model for embeddings:
+
+```bash
+AI_EMBEDDING_PROVIDER=OLLAMA
+AI_EMBEDDING_MODEL=nomic-embed-text      # or any Ollama embedding model you have pulled
+AI_EMBEDDING_BASE_URL=http://localhost:11434   # optional — falls back to OLLAMA_BASE_URL
+
+PGVECTOR_DIMENSIONS=768   # must match the model's output dimension
+```
+
+> **`AI_EMBEDDING_BASE_URL` must be only the host and port — do NOT include any path.**
+> Spring AI 2.0 uses the `/api/embed` endpoint and appends it automatically.
+> Setting this to `http://localhost:11434/api/embeddings` (full path) causes a 404 error.
+>
+> Correct: `AI_EMBEDDING_BASE_URL=http://localhost:11434`
+> Wrong:   `AI_EMBEDDING_BASE_URL=http://localhost:11434/api/embeddings`
+
+> **API endpoint note:** Spring AI 2.0 calls `/api/embed` (Ollama ≥ 0.1.31), not the older `/api/embeddings`.
+> If you test with curl using the old endpoint, that's fine — both work in recent Ollama versions.
+> The Spring AI client always uses the newer endpoint regardless of your curl test command.
+
+Pull the model in Ollama before starting the app:
+
+```bash
+ollama pull nomic-embed-text
+```
+
+Common Ollama embedding models and their dimensions:
+
+| Model | Dimension | Notes |
+|---|---|---|
+| `nomic-embed-text` | 768 | Good general-purpose, small |
+| `mxbai-embed-large` | 1024 | Higher quality |
+| `all-minilm` | 384 | Very fast, lightweight |
+| `bge-m3` | 1024 | Multilingual, good for Persian |
+
+> **Important:** `PGVECTOR_DIMENSIONS` must match the model's actual output dimension.
+> Changing this after the `vector_store` table has been created requires dropping and recreating the table.
+
+---
+
+### Common configuration scenarios
+
+**Scenario 1 — ArvanCloud for both chat and embedding:**
+```bash
+AI_BASE_URL=https://api.arvancloud.ir/ai/v1
+AI_API_KEY=apikey 283de96a-...
+AI_CHAT_MODEL=DeepSeek-R1-distill-qwen-32b
+
+AI_EMBEDDING_PROVIDER=OPENAI_COMPATIBLE
+AI_EMBEDDING_BASE_URL=https://api.arvancloud.ir/ai/v1
+AI_EMBEDDING_API_KEY=apikey 283de96a-...
+AI_EMBEDDING_MODEL=Embedding-3-Small
+PGVECTOR_DIMENSIONS=1024
+```
+
+**Scenario 2 — Ollama for everything (fully local, offline):**
+```bash
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3
+
+AI_EMBEDDING_PROVIDER=OLLAMA
+AI_EMBEDDING_MODEL=nomic-embed-text
+PGVECTOR_DIMENSIONS=768
+```
+
+**Scenario 3 — Cloud chat + local Ollama embeddings:**
+```bash
+AI_BASE_URL=https://api.openai.com/v1
+AI_API_KEY=sk-proj-...
+AI_CHAT_MODEL=gpt-4o-mini
+
+AI_EMBEDDING_PROVIDER=OLLAMA
+AI_EMBEDDING_MODEL=nomic-embed-text
+PGVECTOR_DIMENSIONS=768
+```
 
 ## Project Structure
 
