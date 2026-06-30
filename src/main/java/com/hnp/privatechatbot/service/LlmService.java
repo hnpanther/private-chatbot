@@ -70,6 +70,12 @@ public class LlmService {
     @Value("${app.rag.top-k:5}")
     private int ragTopK;
 
+    @Value("${app.rag.query-history-turns:3}")
+    private int ragQueryHistoryTurns;
+
+    @Value("${app.log.chat-details:false}")
+    private boolean logChatDetails;
+
     /** Lazily-built, thread-safe cache of dedicated ChatClient instances per chatbot ID. */
     private final ConcurrentHashMap<Long, ChatClient> clientCache = new ConcurrentHashMap<>();
 
@@ -88,6 +94,14 @@ public class LlmService {
     public String chat(ChatBot chatBot, List<ChatMessage> history, String userMessage) {
         log.debug("chat(): chatbotId={}, provider={}, historySize={}",
                 chatBot.getId(), chatBot.getLlmProvider(), history.size());
+
+        if (logChatDetails) {
+            for (int i = 0; i < history.size(); i++) {
+                ChatMessage m = history.get(i);
+                log.debug("  history[{}] {}: {}", i, m.getRole(), truncate(m.getContent(), 120));
+            }
+            log.debug("  userMessage: {}", truncate(userMessage, 300));
+        }
 
         String ragQuery = buildRagQuery(history, userMessage);
         String ragContext = retrieveRagContext(chatBot, ragQuery);
@@ -243,11 +257,13 @@ public class LlmService {
                 .filter(m -> m.getRole() == ChatMessage.Role.USER)
                 .skip(Math.max(0, history.stream()
                         .filter(m -> m.getRole() == ChatMessage.Role.USER)
-                        .count() - 3))
+                        .count() - ragQueryHistoryTurns))
                 .map(ChatMessage::getContent)
                 .collect(Collectors.joining(" "));
 
-        return recentHistory.isBlank() ? userMessage : recentHistory + " " + userMessage;
+        String ragQuery = recentHistory.isBlank() ? userMessage : recentHistory + " " + userMessage;
+        if (logChatDetails) log.debug("RAG query: {}", truncate(ragQuery, 300));
+        return ragQuery;
     }
 
     /**
@@ -329,7 +345,14 @@ public class LlmService {
                 log.debug("RAG: no documents found for chatbot id={}, key='{}'", chatBot.getId(), rawKey);
                 return "";
             }
-            log.debug("RAG: {} document(s) retrieved for chatbot id={}", results.size(), chatBot.getId());
+            log.debug("RAG: {} document(s) retrieved for chatbot id={}, key='{}'",
+                    results.size(), chatBot.getId(), rawKey);
+            if (logChatDetails) {
+                for (int i = 0; i < results.size(); i++) {
+                    Document doc = results.get(i);
+                    log.debug("  RAG doc[{}] metadata={} | {}", i, doc.getMetadata(), truncate(doc.getText(), 200));
+                }
+            }
             return results.stream()
                     .map(Document::getText)
                     .collect(Collectors.joining("\n\n---\n\n"));
@@ -372,5 +395,10 @@ public class LlmService {
 
     private String nonBlank(String value, String fallback) {
         return (value != null && !value.isBlank()) ? value : fallback;
+    }
+
+    private String truncate(String text, int maxLen) {
+        if (text == null) return "(null)";
+        return text.length() <= maxLen ? text : text.substring(0, maxLen) + "…";
     }
 }
